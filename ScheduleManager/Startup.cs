@@ -41,6 +41,9 @@ namespace ScheduleManager
             services.AddDefaultIdentity<IdentityUser>()
                 .AddDefaultUI(UIFramework.Bootstrap4)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddDbContext<ScheduleManagerDbContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("ScheduleManagerDbContext")));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
