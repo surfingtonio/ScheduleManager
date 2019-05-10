@@ -14,6 +14,8 @@ namespace ScheduleManager.Data.Entities
 
         public DateTime? EndDate { get; set; }
 
+        public float DurationHours { get; set; }
+
         public int RepeatAfterDays { get; set; }
 
         public int EmployeeId { get; set; }
