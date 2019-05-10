@@ -57,7 +57,7 @@ namespace ScheduleManager.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ScheduleId,StartDate,EndDate,RepeatAfterDays,EmployeeId")] Schedule schedule)
+        public async Task<IActionResult> Create([Bind("ScheduleId,Title,StartDate,EndDate,DurationHours,RepeatAfterDays,EmployeeId")] Schedule schedule)
         {
             if (ModelState.IsValid)
             {
@@ -91,7 +91,7 @@ namespace ScheduleManager.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ScheduleId,StartDate,EndDate,RepeatAfterDays,EmployeeId")] Schedule schedule)
+        public async Task<IActionResult> Edit(int id, [Bind("ScheduleId,Title,StartDate,EndDate,DurationHours,RepeatAfterDays,EmployeeId")] Schedule schedule)
         {
             if (id != schedule.ScheduleId)
             {
