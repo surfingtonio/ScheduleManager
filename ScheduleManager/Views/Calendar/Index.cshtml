@@ -1,0 +1,25 @@
+﻿@model ScheduleManager.Models.CalendarViewModel
+@{
+    ViewData["Title"] = "Calendar";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <form>
+                <div class="form-group">
+                    <label for="employee">Employee</label>
+                    <select name="employee" class="form-control">
+                        @foreach (var employee in Model.Employees)
+                        {
+                            <option value="@employee.EmployeeId" selected="@(employee.EmployeeId == Model.SelectedEmployee.EmployeeId ? "selected" : null)">@employee.Fullname</option>
+                        }
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div id="calendar"></div>
+    </div>
+</div>
