@@ -1,30 +1,63 @@
-﻿@model ScheduleManager.Data.Entities.Employee
+﻿@model ScheduleManager.Models.ScheduleViewModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "View Schedules";
 }
 
-<h1>Details</h1>
+<h1>Schedules</h1>
 
-<div>
-    <h4>Employee</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Firstname)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Firstname)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Lastname)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Lastname)
-        </dd>
-    </dl>
+<div class="container">
+    <form>
+        <div class="form-group">
+            <label asp-for="EmployeeId" class="control-label"></label>
+            <select asp-for="EmployeeId" asp-items="Model.Employees" class="form-control"></select>
+        </div>
+    </form>
+    @if (Model.Employee.Schedules.Count() > 0)
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.Employee.Schedules.FirstOrDefault().Title)</th>
+                    <th>@Html.DisplayNameFor(model => model.Employee.Schedules.FirstOrDefault().StartDate)</th>
+                    <th>@Html.DisplayNameFor(model => model.Employee.Schedules.FirstOrDefault().EndDate)</th>
+                    <th>@Html.DisplayNameFor(model => model.Employee.Schedules.FirstOrDefault().DurationHours)</th>
+                    <th>@Html.DisplayNameFor(model => model.Employee.Schedules.FirstOrDefault().RepeatAfterDays)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var schedule in Model.Employee.Schedules)
+                {
+                    <tr>
+                        <td>@schedule.Title</td>
+                        <td>@schedule.StartDate</td>
+                        <td>@schedule.EndDate</td>
+                        <td>@schedule.DurationHours @(schedule.DurationHours > 1 ? "hours" : "hour")</td>
+                        <td>@schedule.RepeatAfterDays @(schedule.RepeatAfterDays > 1 ? "days" : "day")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No schedules found <a href="@Url.Action("Create", "Schedules", new { Id = Model.EmployeeId })">Add Schedule</a></p>
+    }
+
+    <div>
+        <a href="@Url.Action("Index", "Employees")">Back to List</a>
+    </div>
+
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.EmployeeId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+
+@section Scripts
+{
+    <script type="text/javascript">
+        $(function() {
+            $('#EmployeeId').change(function () {
+                window.location.href = "@Url.Action("Details", "Employees", new { Id = "" })" + "/" + $(this).val();
+            });
+        });
+    </script>
+}

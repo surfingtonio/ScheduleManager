@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ScheduleManager.Data;
 using ScheduleManager.Data.Entities;
+using ScheduleManager.Models;
 
 namespace ScheduleManager.Controllers
 {
@@ -22,25 +21,30 @@ namespace ScheduleManager.Controllers
         // GET: Employees
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Employees.ToListAsync());
+            var employees = await _context.Employees.ToListAsync();
+
+            return View(employees);
         }
 
         // GET: Employees/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var employee = await _context.Employees
+                .Include(e => e.Schedules)
                 .FirstOrDefaultAsync(m => m.EmployeeId == id);
-            if (employee == null)
-            {
-                return NotFound();
-            }
 
-            return View(employee);
+            if (employee == null)
+                return NotFound();
+
+            var employees = _context.Employees.ToList();
+            var data = new ScheduleViewModel()
+            {
+                EmployeeId = employee.EmployeeId,
+                Employee = employee,
+                Employees = new SelectList(employees, "EmployeeId", "Fullname", employee.EmployeeId)
+            };
+
+            return View(data);
         }
 
         // GET: Employees/Create
@@ -60,24 +64,21 @@ namespace ScheduleManager.Controllers
             {
                 _context.Add(employee);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(employee);
         }
 
         // GET: Employees/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var employee = await _context.Employees.FindAsync(id);
+
             if (employee == null)
-            {
                 return NotFound();
-            }
+
             return View(employee);
         }
 
@@ -89,9 +90,7 @@ namespace ScheduleManager.Controllers
         public async Task<IActionResult> Edit(int id, [Bind("EmployeeId,Firstname,Lastname")] Employee employee)
         {
             if (id != employee.EmployeeId)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
@@ -100,36 +99,28 @@ namespace ScheduleManager.Controllers
                     _context.Update(employee);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException ex)
                 {
                     if (!EmployeeExists(employee.EmployeeId))
-                    {
                         return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw ex;
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(employee);
         }
 
         // GET: Employees/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var employee = await _context.Employees
                 .FirstOrDefaultAsync(m => m.EmployeeId == id);
+
             if (employee == null)
-            {
                 return NotFound();
-            }
 
             return View(employee);
         }
@@ -142,6 +133,7 @@ namespace ScheduleManager.Controllers
             var employee = await _context.Employees.FindAsync(id);
             _context.Employees.Remove(employee);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 

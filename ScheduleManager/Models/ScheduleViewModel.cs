@@ -1,20 +1,21 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using ScheduleManager.Data.Entities;
+using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace ScheduleManager.Data.Entities
+namespace ScheduleManager.Models
 {
-    public partial class Schedule
+    public class ScheduleViewModel
     {
         [Display(Name = "Schedule")]
         public int ScheduleId { get; set; }
 
-        [Required]
         public string Title { get; set; }
 
         [Display(Name = "Start Date")]
         public DateTime StartDate { get; set; }
 
-        [Display(Name = "Start End")]
+        [Display(Name = "End Date")]
         public DateTime? EndDate { get; set; }
 
         [Display(Name = "Duration")]
@@ -28,5 +29,6 @@ namespace ScheduleManager.Data.Entities
 
         public Employee Employee { get; set; }
 
+        public SelectList Employees { get; set; }
     }
 }
