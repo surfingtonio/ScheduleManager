@@ -9,7 +9,7 @@
             <form>
                 <div class="form-group">
                     <label for="employee">Employee</label>
-                    <select name="employee" class="form-control">
+                    <select name="employee" class="form-control js-submit-onchange">
                         @foreach (var employee in Model.Employees)
                         {
                             <option value="@employee.EmployeeId" selected="@(employee.EmployeeId == Model.SelectedEmployeeId ? "selected" : null)">@employee.Fullname</option>
@@ -37,10 +37,23 @@
             var calendar = new FullCalendar.Calendar(element, {
                 plugins: ['dayGrid'],
                 defaultView: 'dayGridMonth',
-                events: '/api/Calendar/1'
+                events: function (fetchInfo, next) {
+                    var employeeSelect = $('select[name=employee]');
+                    var employeeId = employeeSelect.val();
+                    $.get({
+                        url: '/api/Calendar/' + employeeId + '?start=' + fetchInfo.startStr + '&end=' + fetchInfo.endStr,
+                        success: function (events) {
+                            next(events);
+                        }
+                    });
+                }
             });
 
             calendar.render();
+
+            employeeSelect.change(function () {
+                calendar.refetchEvents();
+            });
 
         });
     </script>
