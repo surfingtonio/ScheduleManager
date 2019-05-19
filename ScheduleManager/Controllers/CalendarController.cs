@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using ScheduleManager.Data;
 using ScheduleManager.Data.Entities;
 using ScheduleManager.Models;
+using EWSoftware.PDI;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace ScheduleManager.Controllers
 {
@@ -18,15 +21,20 @@ namespace ScheduleManager.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var data = new CalendarViewModel
+            var employee = await _context.Employees.FirstOrDefaultAsync();
+
+            if(employee == null)
+            {
+                return RedirectToAction("Index", "Employees");
+            }
+
+            return View(new CalendarViewModel
             {
                 Employees = _context.Employees.ToList(),
-                SelectedEmployee = _context.Employees.FirstOrDefault()
-            };
-
-            return View(data);
+                SelectedEmployeeId = employee.EmployeeId
+            });
         }
     }
 }
