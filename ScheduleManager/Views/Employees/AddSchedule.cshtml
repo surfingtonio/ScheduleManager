@@ -4,8 +4,6 @@
     ViewData["Title"] = "Add Schedule";
 }
 
-
-
 <div class="container">
     <h4>Add Schedule</h4>
     <hr />
@@ -31,14 +29,14 @@
         <div class="form-group">
             <label>Duration</label>
 
-            <div class="input-group mb-3" v-if="!allDay">
+            <div class="input-group mb-3" v-if="!isAllDay">
                 <div class="input-group-prepend">
                     <span class="input-group-text">Starting at</span>
                 </div>
                 <input type="time" class="form-control" name="startTime" v-model="startTime" required />
             </div>
 
-            <div class="input-group mb-3" v-if="!allDay">
+            <div class="input-group mb-3" v-if="!isAllDay">
                 <div class="input-group-prepend">
                     <span class="input-group-text">For</span>
                 </div>
@@ -49,7 +47,7 @@
             </div>
 
             <div class="form-check">
-                <input type="checkbox" class="form-check-input" name="allDay" v-model="allDay" value="1" />
+                <input type="checkbox" class="form-check-input" name="isAllDay" v-model="isAllDay" value="1" />
                 <label class="form-check-label">All day event</label>
             </div>
         </div>
@@ -64,7 +62,7 @@
                 </option>
             </select>
 
-            <div class="input-group mb-3" v-if="!onWeekdays || frequency != 4">
+            <div class="input-group mb-3" v-if="!isOnWeekdays || frequency != 4">
                 <div class="input-group-prepend">
                     <span class="input-group-text">Repeats every</span>
                 </div>
@@ -119,20 +117,18 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md">
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" name="dayOfWeek" value="64" />
                             <label class="form-check-label">Saturday</label>
                         </div>
                     </div>
-                    <div class="col-md-4"></div>
-                    <div class="col-md-4"></div>
                 </div>
             </div>
 
             <!-- Frequency: Daily -->
             <div class="form-check" v-if="frequency == 4">
-                <input type="checkbox" class="form-check-input" name="dayOfWeek" v-model="onWeekdays" value="62" />
+                <input type="checkbox" class="form-check-input" name="dayOfWeek" v-model="isOnWeekdays" value="62" />
                 <label class="form-check-label">On weekdays</label>
             </div>
         </div>
@@ -178,7 +174,6 @@
                 title: 'Untitled Event',
                 startDate: '@DateTime.Today.ToString("yyyy-MM-dd")',
                 endDate: '@DateTime.Today.ToString("yyyy-MM-dd")',
-                allDay: false,
                 startTime: '07:00',
                 duration: 1,
                 frequency: 1,
@@ -189,8 +184,8 @@
                     { text: 'Daily', unit: 'day', value: 4 },
                 ],
                 interval: 1,
-                onWeekdays: false,
-                allDay: false,
+                isOnWeekdays: false,
+                isAllDay: false,
                 repeatsIndefinitely: true,
                 canOccurOnHolidays: false
             },
