@@ -137,6 +137,19 @@ namespace ScheduleManager.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // GET: Employees/1/Schedules
+        public async Task<IActionResult> ShowSchedules(int employeeId)
+        {
+            var employee = await _context.Employees
+                .Include(e => e.Schedules)
+                .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
+
+            if (employee == null)
+                return NotFound();
+
+            return View(employee);
+        }
+
         private bool EmployeeExists(int id)
         {
             return _context.Employees.Any(e => e.EmployeeId == id);

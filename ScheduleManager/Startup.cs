@@ -72,6 +72,10 @@ namespace ScheduleManager
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
+                    name: "employeeSchedules",
+                    template: "{controller=Employees}/{employeeId:int}/Schedules/{action=ShowSchedules}/{scheduleId?}");
+
+                routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });

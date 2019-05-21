@@ -1,0 +1,45 @@
+﻿@model ScheduleManager.Data.Entities.Employee;
+
+@{
+    ViewData["Title"] = "View Schedules";
+}
+
+<h1>View Schedules</h1>
+
+<div class="container">
+    @if (Model.Schedules.Count() > 0)
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.Schedules.FirstOrDefault().Title)</th>
+                    <th>@Html.DisplayNameFor(model => model.Schedules.FirstOrDefault().StartDate)</th>
+                    <th>@Html.DisplayNameFor(model => model.Schedules.FirstOrDefault().EndDate)</th>
+                    <th>@Html.DisplayNameFor(model => model.Schedules.FirstOrDefault().DurationHours)</th>
+                    <th>@Html.DisplayNameFor(model => model.Schedules.FirstOrDefault().RepeatAfterDays)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var schedule in Model.Schedules)
+                {
+                    <tr>
+                        <td>@schedule.Title</td>
+                        <td>@schedule.StartDate</td>
+                        <td>@schedule.EndDate</td>
+                        <td>@schedule.DurationHours @(schedule.DurationHours > 1 ? "hours" : "hour")</td>
+                        <td>@schedule.RepeatAfterDays @(schedule.RepeatAfterDays > 1 ? "days" : "day")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No schedules found <a href="@Url.Action("Create", "Schedules", new { Id = Model.EmployeeId })">Add Schedule</a></p>
+    }
+
+    <div>
+        <a href="@Url.Action("Index", "Employees")">Back to List</a>
+    </div>
+
+</div>
