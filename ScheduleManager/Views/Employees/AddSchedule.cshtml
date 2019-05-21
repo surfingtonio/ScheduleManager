@@ -1,0 +1,137 @@
+﻿@model ScheduleManager.Data.Entities.Employee;
+
+@{
+    ViewData["Title"] = "Add Schedule";
+}
+
+<div class="container">
+    <form id="app">
+        <input type="hidden" asp-for="EmployeeId" />
+
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" class="form-control" name="title" v-model="title" required />
+        </div>
+
+        <div class="form-group">
+            <label>Start Date</label>
+            <input type="date" class="form-control" name="startDate" v-model="startDate" required />
+        </div>
+
+        <div class="form-group">
+            <label>Duration</label>
+
+            <div class="input-group mb-3" v-if="!allDay">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Starting at</span>
+                </div>
+                <input type="time" class="form-control" name="startTime" v-model="startTime" required />
+            </div>
+
+            <div class="input-group mb-3" v-if="!allDay">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">For</span>
+                </div>
+                <input type="number" class="form-control" name="duration" v-model="duration" min="1" max="24" step=".5" />
+                <div class="input-group-append">
+                    <span class="input-group-text" id="frequencyUnit">hour{{ duration > 1 ? 's' : ''}}</span>
+                </div>
+            </div>
+
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" name="allDay" v-model="allDay" value="1" />
+                <label class="form-check-label">All day event</label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Frequency</label>
+            <select class="form-control" name="frequency" v-model="frequency">
+                <option v-for="frequency in frequencies" :value="frequency.value">
+                    {{ frequency.text }}
+                </option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <div class="input-group mb-3" v-if="!onWeekdays || frequency != 4">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Repeats every</span>
+                </div>
+                <input type="number" class="form-control" name="interval" v-model="interval" min="1" />
+                <div class="input-group-append">
+                    <span class="input-group-text">{{ frequencies[frequency - 1].unit }}{{ interval > 1 ? 's' : ''}}</span>
+                </div>
+            </div>
+
+            <div class="form-check" v-if="frequency == 4">
+                <input type="checkbox" class="form-check-input" name="dayOfWeek" v-model="onWeekdays" value="62" />
+                <label class="form-check-label">On weekdays</label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>End Date</label>
+            <div class="input-group mb-3" v-if="!repeatsIndefinitely">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Repeat until</span>
+                </div>
+                <input type="date" class="form-control" name="endDate" v-model="endDate" required />
+            </div>
+
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" name="repeatsIndefinitely" v-model="repeatsIndefinitely" value="1" />
+                <label class="form-check-label">Repeats indefinitely</label>
+            </div>
+        </div>
+
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" name="canOccurOnHolidays" v-model="canOccurOnHolidays" value="1" />
+            <label class="form-check-label">Can occur on holidays</label>
+        </div>
+
+        <div class="pt-4">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+
+    </form>
+</div>
+@section Scripts
+    {
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script type="text/javascript">
+        var app = new Vue({
+            el: '#app',
+            data: {
+                title: 'Untitled Event',
+                startDate: '@DateTime.Today.ToString("yyyy-MM-dd")',
+                endDate: '@DateTime.Today.ToString("yyyy-MM-dd")',
+                allDay: false,
+                startTime: '07:00',
+                duration: 1,
+                frequency: 1,
+                frequencies: [
+                    { text: 'Yearly', unit: 'year', value: 1 },
+                    { text: 'Monthly', unit: 'month', value: 2 },
+                    { text: 'Weekly', unit: 'week', value: 3 },
+                    { text: 'Daily', unit: 'day', value: 4 },
+                ],
+                interval: 1,
+                onWeekdays: false,
+                allDay: false,
+                repeatsIndefinitely: true,
+                canOccurOnHolidays: false
+            }
+        })
+    </script>
+    <script type="text/javascript">
+        $(function () {
+
+            $('form').submit(function () {
+                console.log($(this).serialize());
+                return false;
+            });
+
+        });
+    </script>
+}

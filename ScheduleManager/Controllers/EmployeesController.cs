@@ -150,6 +150,37 @@ namespace ScheduleManager.Controllers
             return View(employee);
         }
 
+        // GET: Employees/1/Schedules/Add
+        [Route("Employees/{employeeId}/Schedules/Add")]
+        public async Task<IActionResult> AddSchedule(int employeeId)
+        {
+            var employee = await _context.Employees
+                .Include(e => e.Schedules)
+                .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
+
+            if (employee == null)
+                return NotFound();
+
+            return View(employee);
+        }
+
+        // POST: Employees/1/Schedules/Add
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("Employees/{employeeId}/Schedules/Add")]
+        public async Task<IActionResult> AddSchedule([Bind("")] Schedule schedule)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Schedules.Add(schedule);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(ShowSchedules));
+            }
+
+            return View(schedule);
+        }
+
         private bool EmployeeExists(int id)
         {
             return _context.Employees.Any(e => e.EmployeeId == id);
