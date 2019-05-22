@@ -26,27 +26,6 @@ namespace ScheduleManager.Controllers
             return View(employees);
         }
 
-        // GET: Employees/Details/5
-        public async Task<IActionResult> Details(int id)
-        {
-            var employee = await _context.Employees
-                .Include(e => e.Schedules)
-                .FirstOrDefaultAsync(m => m.EmployeeId == id);
-
-            if (employee == null)
-                return NotFound();
-
-            var employees = _context.Employees.ToList();
-            var data = new ScheduleViewModel()
-            {
-                EmployeeId = employee.EmployeeId,
-                Employee = employee,
-                Employees = new SelectList(employees, "EmployeeId", "Fullname", employee.EmployeeId)
-            };
-
-            return View(data);
-        }
-
         // GET: Employees/Create
         public IActionResult Create()
         {
