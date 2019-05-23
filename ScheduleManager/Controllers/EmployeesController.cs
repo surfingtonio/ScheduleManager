@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ScheduleManager.Data;
 using ScheduleManager.Data.Entities;
-using ScheduleManager.Models;
 
 namespace ScheduleManager.Controllers
 {
@@ -183,39 +182,22 @@ namespace ScheduleManager.Controllers
                 }
 
                 if (schedule.IsOnWeekdays)
-                    // RecurFrequency.Daily
                     r.RecurEveryWeekday();
                 else
                     r.Interval = schedule.Interval;
 
-                //var days = new List<DayOfWeek>();
-                //foreach(var day in schedule.DaysOfWeek)
-                //    days.Add((DayOfWeek)day);
-
                 if (schedule.Frequency == RecurFrequency.Weekly)
-                    r.ByDay.AddRange(schedule.DaysOfWeek);
+                {
+                    r.ByDay.AddRange(schedule.Days
+                        .Select(day => (System.DayOfWeek)day));
 
-                var events = r.InstancesBetween(new DateTime(2018, 10, 15), DateTime.Today.AddMonths(2));
+                    if(schedule.Days.Count > 0)
+                        foreach (var day in schedule.Days)
+                            schedule.DaysOfWeek.Add(await _context.DaysOfWeek.FindAsync(day));
+                }
 
-
-                //var ms = new MasterSchedule()
-                //{
-                //    Title = schedule.Title,
-                //    StartDate = schedule.StartDate,
-                //    DurationHours = schedule.DurationHours,
-                //    Frequency = schedule.Frequency,
-                //    Interval = schedule.Interval,
-                //    EndDate = schedule.EndDate,
-                //    IsAllDay = schedule.IsAllDay,
-                //    IsOnWeekdays = schedule.IsOnWeekdays,
-                //    CanOccurOnHolidays = schedule.CanOccurOnHolidays,
-                //    RepeatsIndefinitely = schedule.RepeatsIndefinitely,
-                //    DaysOfWeek = schedule.DayOfWeek,
-                //    EmployeeId = schedule.EmployeeId
-                //};
-
-                //_context.Add(ms);
-                //await _context.SaveChangesAsync();
+                _context.Add(schedule);
+                await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(ShowSchedules), new { EmployeeId = schedule.EmployeeId });
             }

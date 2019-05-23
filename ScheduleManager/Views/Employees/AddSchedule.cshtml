@@ -63,7 +63,7 @@
             <div class="weekly-options" v-if="frequency == 3">
                 @* TODO: Convert to Select2 *@
                 <label asp-for="DaysOfWeek">On</label>
-                <select asp-for="DaysOfWeek" asp-items="Html.GetEnumSelectList<DayOfWeek>()" class="form-control mb-3" multiple></select>
+                <select asp-for="Days" asp-items="Html.GetEnumSelectList<DayOfWeek>()" class="form-control mb-3" multiple></select>
             </div>
 
             <!-- Frequency: Daily -->
