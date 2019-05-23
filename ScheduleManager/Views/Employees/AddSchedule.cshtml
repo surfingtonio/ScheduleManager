@@ -1,4 +1,4 @@
-﻿@model ScheduleManager.Data.Entities.Employee;
+﻿@model ScheduleManager.Data.Entities.MasterSchedule;
 
 @{
     ViewData["Title"] = "Add Schedule";
@@ -8,152 +8,92 @@
     <h4>Add Schedule</h4>
     <hr />
 
-    <form id="app">
-        <input type="hidden" asp-for="EmployeeId" />
+    <form asp-action="AddSchedule" id="app">
+        <input asp-for="EmployeeId" type="hidden" />
 
         <!-- Title -->
         <div class="form-group">
-            <label>Title</label>
-
-            <input type="text" class="form-control" name="title" v-model="title" required />
+            <label asp-for="Title">Title</label>
+            <input asp-for="Title" class="form-control" v-model="title" required />
         </div>
 
         <!-- Start Date -->
         <div class="form-group">
-            <label>Start Date</label>
-
-            <input type="date" class="form-control" name="startDate" v-model="startDate" required />
+            <label asp-for="StartDate">Start Date</label>
+            <input asp-for="StartDate" class="form-control" step="any" v-model="startDate" required />
         </div>
 
         <!-- Duration -->
         <div class="form-group">
-            <label>Duration</label>
-
-            <div class="input-group mb-3" v-if="!isAllDay">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Starting at</span>
-                </div>
-                <input type="time" class="form-control" name="startTime" v-model="startTime" required />
-            </div>
+            <label asp-for="DurationHours">Duration</label>
 
             <div class="input-group mb-3" v-if="!isAllDay">
                 <div class="input-group-prepend">
                     <span class="input-group-text">For</span>
                 </div>
-                <input type="number" class="form-control" name="duration" v-model="duration" min="1" max="24" step=".5" />
+                <input asp-for="DurationHours" type="number" class="form-control" v-model="durationHours" min="1" max="24" step=".5" />
                 <div class="input-group-append">
-                    <span class="input-group-text" id="frequencyUnit">hour{{ duration > 1 ? 's' : ''}}</span>
+                    <span class="input-group-text">hour{{ durationHours > 1 ? 's' : ''}}</span>
                 </div>
             </div>
 
             <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="isAllDay" name="isAllDay" v-model="isAllDay" value="1" />
-                <label class="form-check-label" for="isAllDay">All day event</label>
+                <input asp-for="IsAllDay" class="form-check-input" v-model="isAllDay" />
+                <label asp-for="IsAllDay" class="form-check-label">All day event</label>
             </div>
         </div>
 
         <!-- Frequency -->
         <div class="form-group">
-            <label>Frequency</label>
-
-            <select class="form-control mb-3" name="frequency" v-model="frequency">
-                <option v-for="frequency in frequencies" :value="frequency.value">
-                    {{ frequency.text }}
-                </option>
-            </select>
+            <!-- We are only supporting Yearly, Monthly, Weekly and Daily frequencies -->
+            <label asp-for="Frequency">Frequency</label>
+            <select asp-for="Frequency" asp-items="Html.GetEnumSelectList<EWSoftware.PDI.RecurFrequency>()" class="form-control mb-3" v-model="frequency"></select>
 
             <div class="input-group mb-3" v-if="!isOnWeekdays || frequency != 4">
                 <div class="input-group-prepend">
                     <span class="input-group-text">Repeats every</span>
                 </div>
-                <input type="number" class="form-control" name="interval" v-model="interval" min="1" />
+                <input asp-for="Interval" type="number" class="form-control" v-model="interval" min="1" />
                 <div class="input-group-append">
-                    <span class="input-group-text">{{ frequencies[frequency - 1].unit }}{{ interval > 1 ? 's' : ''}}</span>
+                    <span class="input-group-text">{{ frequencies[frequency - 1] }}{{ interval > 1 ? 's' : ''}}</span>
                 </div>
             </div>
 
             <!-- Frequency: Weekly -->
             <div class="weekly-options" v-if="frequency == 3">
-                <label>On</label>
-
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="dayOfWeekSunday" name="dayOfWeek" value="1" />
-                            <label class="form-check-label" for="dayOfWeekSunday">Sunday</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="dayOfWeekMonday" name="dayOfWeek" value="2" />
-                            <label class="form-check-label" for="dayOfWeekMonday">Monday</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="dayOfWeekTuesday" name="dayOfWeek" value="4" />
-                            <label class="form-check-label" for="dayOfWeekTuesday">Tuesday</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="dayOfWeekWednesday" name="dayOfWeek" value="8" />
-                            <label class="form-check-label" for="dayOfWeekWednesday">Wednesday</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="dayOfWeekThursday" name="dayOfWeek" value="16" />
-                            <label class="form-check-label" for="dayOfWeekThursday">Thursday</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="dayOfWeekFriday" name="dayOfWeek" value="32" />
-                            <label class="form-check-label" for="dayOfWeekFriday">Friday</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="dayOfWeekSaturday" name="dayOfWeek" value="64" />
-                            <label class="form-check-label" for="dayOfWeekSaturday">Saturday</label>
-                        </div>
-                    </div>
-                </div>
+                @* TODO: Convert to Select2 *@
+                <label asp-for="DaysOfWeek">On</label>
+                <select asp-for="DaysOfWeek" asp-items="Html.GetEnumSelectList<DayOfWeek>()" class="form-control mb-3" multiple></select>
             </div>
 
             <!-- Frequency: Daily -->
             <div class="form-check" v-if="frequency == 4">
-                <input type="checkbox" class="form-check-input" id="isOnWeekdays" name="dayOfWeek" v-model="isOnWeekdays" value="62" />
-                <label class="form-check-label" for="isOnWeekdays">On weekdays</label>
+                <input asp-for="IsOnWeekdays" class="form-check-input" v-model="isOnWeekdays" />
+                <label asp-for="IsOnWeekdays" class="form-check-label">On weekdays</label>
             </div>
         </div>
 
         <!-- End Date -->
         <div class="form-group">
-            <label>End Date</label>
+            <label asp-for="EndDate">End Date</label>
 
             <div class="form-check mb-3">
-                <input type="checkbox" class="form-check-input" id="repeatsIndefinitely" name="repeatsIndefinitely" v-model="repeatsIndefinitely" value="1" />
-                <label class="form-check-label" for="repeatsIndefinitely">Repeats indefinitely</label>
+                <input asp-for="RepeatsIndefinitely" class="form-check-input" v-model="repeatsIndefinitely" />
+                <label asp-for="RepeatsIndefinitely" class="form-check-label">Repeats indefinitely</label>
             </div>
 
             <div class="input-group" v-if="!repeatsIndefinitely">
                 <div class="input-group-prepend">
                     <span class="input-group-text">Repeat until</span>
                 </div>
-                <input type="date" class="form-control" name="endDate" v-model="endDate" required />
+                <input asp-for="EndDate" class="form-control" step="any" v-model="endDate" />
             </div>
         </div>
 
         <!-- Can occur on holidays -->
         <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="canOccurOnHolidays" name="canOccurOnHolidays" v-model="canOccurOnHolidays" value="1" />
-            <label class="form-check-label" for="canOccurOnHolidays">Can occur on holidays</label>
+            <input asp-for="CanOccurOnHolidays" class="form-check-input" v-model="canOccurOnHolidays" />
+            <label asp-for="CanOccurOnHolidays" class="form-check-label">Can occur on holidays</label>
         </div>
 
         <div class="pt-4">
@@ -163,6 +103,7 @@
 
     </form>
 </div>
+
 @section Scripts
     {
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
@@ -171,23 +112,17 @@
             el: '#app',
 
             data: {
-                title: 'Untitled Event',
-                startDate: '@DateTime.Today.ToString("yyyy-MM-dd")',
-                endDate: '@DateTime.Today.ToString("yyyy-MM-dd")',
-                startTime: '07:00',
-                duration: 1,
-                frequency: 1,
-                frequencies: [
-                    { text: 'Yearly', unit: 'year', value: 1 },
-                    { text: 'Monthly', unit: 'month', value: 2 },
-                    { text: 'Weekly', unit: 'week', value: 3 },
-                    { text: 'Daily', unit: 'day', value: 4 },
-                ],
-                interval: 1,
-                isOnWeekdays: false,
-                isAllDay: false,
-                repeatsIndefinitely: true,
-                canOccurOnHolidays: false
+                title: '@Model.Title',
+                startDate: '@Model.StartDate.ToString("yyyy-MM-ddT08:00:00")',
+                endDate: '@Model.EndDate?.ToString("yyyy-MM-ddT08:00:00")',
+                durationHours: @Model.DurationHours,
+                frequency: @((int)EWSoftware.PDI.RecurFrequency.Weekly),
+                frequencies: ['year', 'month', 'week', 'day'],
+                interval: @Model.Interval,
+                isOnWeekdays: @Json.Serialize(Model.IsOnWeekdays),
+                isAllDay: @Json.Serialize(Model.IsAllDay),
+                repeatsIndefinitely: @Json.Serialize(Model.RepeatsIndefinitely),
+                canOccurOnHolidays: @Json.Serialize(Model.CanOccurOnHolidays)
             },
 
             methods: {
@@ -201,8 +136,9 @@
         $(function () {
 
             $('form').submit(function () {
+
                 console.log($(this).serialize());
-                return false;
+                //return false;
             });
 
         });

@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using EWSoftware.PDI;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ScheduleManager.Data;
 using ScheduleManager.Data.Entities;
@@ -25,6 +27,7 @@ namespace ScheduleManager.Controllers
 
             return View(employees);
         }
+
 
         // GET: Employees/Create
         public IActionResult Create()
@@ -140,21 +143,81 @@ namespace ScheduleManager.Controllers
             if (employee == null)
                 return NotFound();
 
-            return View(employee);
+            var schedule = new MasterSchedule()
+            {
+                EmployeeId = employee.EmployeeId,
+                Employee = employee,
+            };
+
+            return View(schedule);
         }
 
         // POST: Employees/1/Schedules/Add
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("Employees/{employeeId}/Schedules/Add")]
-        public async Task<IActionResult> AddSchedule([Bind("")] Schedule schedule)
+        public async Task<IActionResult> AddSchedule([Bind()] MasterSchedule schedule)
         {
+            var employee = _context.Employees
+                .FirstOrDefaultAsync(e => e.EmployeeId == schedule.EmployeeId);
+
+            if (employee == null)
+                return NotFound();
+
             if (ModelState.IsValid)
             {
-                _context.Schedules.Add(schedule);
-                await _context.SaveChangesAsync();
+                // TODO: Generate rrule here.
+                var r = new Recurrence()
+                {
+                    StartDateTime = schedule.StartDate,
+                    Frequency = (RecurFrequency)schedule.Frequency,
+                    CanOccurOnHoliday = schedule.CanOccurOnHolidays
+                };
 
-                return RedirectToAction(nameof(ShowSchedules));
+                if (!schedule.RepeatsIndefinitely)
+                {
+                    if (schedule.EndDate == null)
+                        throw new ArgumentNullException();
+
+                    r.RecurUntil = (DateTime)schedule.EndDate;
+                }
+
+                if (schedule.IsOnWeekdays)
+                    // RecurFrequency.Daily
+                    r.RecurEveryWeekday();
+                else
+                    r.Interval = schedule.Interval;
+
+                //var days = new List<DayOfWeek>();
+                //foreach(var day in schedule.DaysOfWeek)
+                //    days.Add((DayOfWeek)day);
+
+                if (schedule.Frequency == RecurFrequency.Weekly)
+                    r.ByDay.AddRange(schedule.DaysOfWeek);
+
+                var events = r.InstancesBetween(new DateTime(2018, 10, 15), DateTime.Today.AddMonths(2));
+
+
+                //var ms = new MasterSchedule()
+                //{
+                //    Title = schedule.Title,
+                //    StartDate = schedule.StartDate,
+                //    DurationHours = schedule.DurationHours,
+                //    Frequency = schedule.Frequency,
+                //    Interval = schedule.Interval,
+                //    EndDate = schedule.EndDate,
+                //    IsAllDay = schedule.IsAllDay,
+                //    IsOnWeekdays = schedule.IsOnWeekdays,
+                //    CanOccurOnHolidays = schedule.CanOccurOnHolidays,
+                //    RepeatsIndefinitely = schedule.RepeatsIndefinitely,
+                //    DaysOfWeek = schedule.DayOfWeek,
+                //    EmployeeId = schedule.EmployeeId
+                //};
+
+                //_context.Add(ms);
+                //await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(ShowSchedules), new { EmployeeId = schedule.EmployeeId });
             }
 
             return View(schedule);
