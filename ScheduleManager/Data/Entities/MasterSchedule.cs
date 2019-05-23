@@ -1,13 +1,13 @@
 ﻿using EWSoftware.PDI;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ScheduleManager.Data.Entities
 {
     public class MasterSchedule
     {
-        public int ScheduleId { get; set; }
+        public int MasterScheduleId { get; set; }
 
         public string Title { get; set; } = "Untitled Event";
 
@@ -19,7 +19,6 @@ namespace ScheduleManager.Data.Entities
 
         public int Interval { get; set; } = 1;
 
-
         public DateTime? EndDate { get; set; }
 
         public bool IsAllDay { get; set; }
@@ -30,7 +29,10 @@ namespace ScheduleManager.Data.Entities
 
         public bool RepeatsIndefinitely { get; set; } = true;
 
-        public List<DayOfWeek> DaysOfWeek { get; set; } = new List<DayOfWeek>() { DateTime.Today.DayOfWeek };
+        [NotMapped]
+        public List<int> Days { get; set; }
+
+        public virtual ICollection<DayOfWeek> DaysOfWeek { get; set; } = new HashSet<DayOfWeek>();
 
         public virtual int EmployeeId { get; set; }
 

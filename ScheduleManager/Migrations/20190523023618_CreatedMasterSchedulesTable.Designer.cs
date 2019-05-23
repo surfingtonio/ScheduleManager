@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ScheduleManager.Data;
 
 namespace ScheduleManager.Migrations
 {
     [DbContext(typeof(ScheduleManagerDbContext))]
-    partial class ScheduleManagerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190523023618_CreatedMasterSchedulesTable")]
+    partial class CreatedMasterSchedulesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
