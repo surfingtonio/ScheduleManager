@@ -16,5 +16,6 @@ namespace ScheduleManager.Data
 
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Schedule> Schedules { get; set; }
+        public DbSet<DayOfWeek> DaysOfWeek { get; set; }
     }
 }
