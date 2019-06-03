@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using EWSoftware.PDI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ScheduleManager.Data;
 using ScheduleManager.Models;
-using EWSoftware.PDI;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ScheduleManager.Api
 {
@@ -38,8 +38,11 @@ namespace ScheduleManager.Api
             foreach (var schedule in employee.Schedules)
             {
                 recurrence.StartDateTime = schedule.StartDate;
-                recurrence.RecurDaily(schedule.RepeatAfterDays);
+                recurrence.RecurDaily(schedule.Interval);
 
+                var timespan = schedule.EndDate == null ?
+                    new System.TimeSpan(24, 0, 0) :
+                    schedule.EndDate - schedule.StartDate;
                 var dates = recurrence.InstancesBetween(dateRange.Start, dateRange.End);
                 foreach (var item in dates.Select((date, index) => new { date, index }))
                 {
@@ -49,7 +52,7 @@ namespace ScheduleManager.Api
                         GroupId = $"event_{schedule.EmployeeId}_{schedule.ScheduleId}",
                         Title = schedule.Title,
                         Start = item.date,
-                        End = item.date.AddHours(schedule.DurationHours)
+                        End = item.date.AddHours(timespan.Value.Hours)
                     });
                 }
             }

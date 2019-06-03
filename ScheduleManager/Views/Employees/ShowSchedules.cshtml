@@ -15,8 +15,6 @@
                     <th>@Html.DisplayNameFor(model => model.Schedules.FirstOrDefault().Title)</th>
                     <th>@Html.DisplayNameFor(model => model.Schedules.FirstOrDefault().StartDate)</th>
                     <th>@Html.DisplayNameFor(model => model.Schedules.FirstOrDefault().EndDate)</th>
-                    <th>@Html.DisplayNameFor(model => model.Schedules.FirstOrDefault().DurationHours)</th>
-                    <th>@Html.DisplayNameFor(model => model.Schedules.FirstOrDefault().RepeatAfterDays)</th>
                 </tr>
             </thead>
             <tbody>
@@ -26,8 +24,6 @@
                         <td>@schedule.Title</td>
                         <td>@schedule.StartDate</td>
                         <td>@schedule.EndDate</td>
-                        <td>@schedule.DurationHours @(schedule.DurationHours > 1 ? "hours" : "hour")</td>
-                        <td>@schedule.RepeatAfterDays @(schedule.RepeatAfterDays > 1 ? "days" : "day")</td>
                     </tr>
                 }
             </tbody>
