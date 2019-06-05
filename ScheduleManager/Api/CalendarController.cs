@@ -20,7 +20,7 @@ namespace ScheduleManager.Api
             _context = context;
         }
 
-        // GET: api/Calendar/5?StartDate=2019-01-01&EndDate=2019-02-05
+        // GET: api/Calendar/5?Start=2019-01-01&End=2019-02-05
         [HttpGet("{id}")]
         public async Task<ActionResult<IEnumerable<FullCalendarEvent>>> GetSchedules(int id, [FromQuery] DateRange dateRange)
         {
@@ -34,25 +34,21 @@ namespace ScheduleManager.Api
             }
 
             var events = new List<FullCalendarEvent>();
-            var recurrence = new Recurrence();
             foreach (var schedule in employee.Schedules)
             {
-                recurrence.StartDateTime = schedule.StartDate;
-                recurrence.RecurDaily(schedule.Interval);
-
+                var shifts = schedule.GetInstancesBetween(dateRange.Start, dateRange.End);
                 var timespan = schedule.EndDate == null ?
                     new System.TimeSpan(24, 0, 0) :
                     schedule.EndDate - schedule.StartDate;
-                var dates = recurrence.InstancesBetween(dateRange.Start, dateRange.End);
-                foreach (var item in dates.Select((date, index) => new { date, index }))
+                foreach (var shift in shifts.Select((date, index) => new { date, index }))
                 {
                     events.Add(new FullCalendarEvent
                     {
-                        Id = $"event_{schedule.EmployeeId}_{schedule.ScheduleId}_{item.index.ToString().PadLeft(5, '0')}",
+                        Id = $"event_{schedule.EmployeeId}_{schedule.ScheduleId}_{shift.index.ToString().PadLeft(5, '0')}",
                         GroupId = $"event_{schedule.EmployeeId}_{schedule.ScheduleId}",
                         Title = schedule.Title,
-                        Start = item.date,
-                        End = item.date.AddHours(timespan.Value.Hours)
+                        Start = shift.date,
+                        End = shift.date.AddHours(timespan.Value.Hours)
                     });
                 }
             }
